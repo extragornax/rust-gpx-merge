@@ -4,5 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+axum = {version = "0.8.1", features = ["tokio", "multipart", "default"]}
 clap = { version = "4.5.31", features = ["derive"] }
-gpx = "0.10.0"
+gpx = {version = "0.10.0", features = []}
+tokio = { version = "1.43.0", features = ["full"]}
+tower-http = {  version = "0.6.2", features = ["fs"] }
+serde_json = "1.0.140"
+futures = "0.3.31"
+blake3 = "1.6.1"
