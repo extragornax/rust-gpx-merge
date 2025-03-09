@@ -1,7 +1,7 @@
 use crate::ClapHandler;
 use crate::merge::merge_traces;
 use crate::read::read_gpx;
-use crate::write::write_multipart_file;
+use crate::write::{write_multipart_file, PREFIX_TRACE};
 use axum::body::{Body, Bytes};
 use axum::extract::{DefaultBodyLimit, Multipart};
 use axum::http::StatusCode;
@@ -28,7 +28,7 @@ async fn send_to_trigger(Json(body): Json<TriggerBody>) -> Result<Response, Stat
     let mut gpx_extract: Vec<Gpx> = Vec::new();
 
     for item in body.hashes {
-        let file_path = format!("{}/{}.gpx", "traces_import", item);
+        let file_path = format!("{}/{}.gpx", PREFIX_TRACE, item);
         let r = read_gpx(&file_path);
         match r {
             Ok(gpx) => gpx_extract.push(gpx),
