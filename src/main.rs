@@ -26,6 +26,8 @@ struct ClapHandler {
     pub destination_file: String,
     #[clap(long)]
     pub webserver: bool,
+    #[clap(long, default_value = "127.0.0.1:8080")]
+    pub webserver_bind: String,
 }
 
 #[tokio::main]

@@ -19,8 +19,6 @@ pub fn write_gpx(out_path: String, data: &Gpx) -> std::io::Result<()> {
 
 pub fn write_multipart_file(
     file_name: String,
-    name: String,
-    content_type: String,
     data: Bytes,
 ) -> std::io::Result<String> {
     let prefix = "traces_import";
@@ -32,11 +30,9 @@ pub fn write_multipart_file(
 
     let full_path = format!("{}/{}.gpx", prefix, file_name_bash);
     let path = Path::new(&full_path);
-    let mut file = File::create(&path).expect("Unable to create file");
+    let mut file = File::create(path).expect("Unable to create file");
     let mut writer = BufWriter::new(&mut file);
 
-    // writeln!(writer, "Name: {}", name)?;
-    // writeln!(writer, "Content-Type: {}", content_type)?;
     writer.write_all(data.as_ref())?;
 
     Ok(file_name_bash)

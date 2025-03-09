@@ -43,6 +43,7 @@ async fn send_to_trigger(Json(body): Json<TriggerBody>) -> Result<Response, Stat
 
     let mut vec = Vec::new();
     if let Err(e) = gpx::write(&merged, &mut vec) {
+        println!("Error writing traces: {}", e);
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
     let string = match String::from_utf8(vec) {
@@ -75,7 +76,7 @@ async fn accept_form(mut multipart: Multipart) -> Result<Response, StatusCode> {
             name = Some(n.to_string());
         };
         if let Some(f_n) = field.file_name() {
-            file_name = Some(f_n.clone().to_string())
+            file_name = Some(f_n.to_string())
         }
         if let Some(f) = field.content_type() {
             content_type = Some(f.to_string());
@@ -102,8 +103,6 @@ async fn accept_form(mut multipart: Multipart) -> Result<Response, StatusCode> {
     } else {
         let t = write_multipart_file(
             file_name.unwrap(),
-            name.unwrap(),
-            content_type.unwrap(),
             data.unwrap(),
         );
         if let Err(e) = t {
@@ -241,15 +240,15 @@ async fn home_page() -> impl IntoResponse {
 
 const MEGABYTE_SIZE: usize = 1024 * 1000;
 
-pub async fn handle_web(handler: ClapHandler) {
+pub async fn handle_web(args: ClapHandler) {
     let app = Router::new()
         .route("/trigger", post(send_to_trigger))
         .route("/upload", post(accept_form))
         .route("/", get(home_page))
         .layer(DefaultBodyLimit::max(MEGABYTE_SIZE * 50));
 
-    let bind = "127.0.0.1:8080".to_string();
-    let listener = tokio::net::TcpListener::bind(&bind)
+    println!("Binding to {}", args.webserver_bind);
+    let listener = tokio::net::TcpListener::bind(&args.webserver_bind)
         .await
         .expect("Cannot bind server to address and port")
         .tap_io(|tcp_stream| {
@@ -258,5 +257,5 @@ pub async fn handle_web(handler: ClapHandler) {
             }
         });
 
-    let _ = axum::serve(listener, app).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }
