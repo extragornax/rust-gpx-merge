@@ -1,13 +1,21 @@
 use gpx::Gpx;
 
-pub fn merge_traces(data: &[Gpx]) -> Gpx {
+pub fn sort_files(data: &Vec<Gpx>) -> Vec<Gpx> {
+    let mut cloned = data.clone();
+    cloned.sort_by_key(|item| item.tracks[0].segments[0].points[0].time);
+    cloned
+}
+
+pub fn merge_traces(data: &Vec<Gpx>) -> Gpx {
     if data.is_empty() {
         return Gpx::default();
     } else if data.len() == 1 {
         return data[0].clone();
     }
 
-    let (base, remaining_items) = data.split_at(1);
+    let sorted = sort_files(&data);
+
+    let (base, remaining_items) = sorted.split_at(1);
     let mut base = base[0].clone();
     remaining_items.iter().for_each(|item| {
         let local_tracks = &item.tracks;

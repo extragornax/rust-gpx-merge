@@ -1,16 +1,16 @@
 mod merge;
 mod read;
 mod stats;
-mod write;
 mod webserver;
+mod write;
 
 use crate::merge::merge_traces;
 use crate::read::{get_all_gpx_files_in_dir, read_gpx};
 use crate::stats::print_stats;
+use crate::webserver::handle_web;
 use crate::write::write_gpx;
 use clap::Parser;
 use gpx::Gpx;
-use crate::webserver::handle_web;
 
 #[derive(Parser, Debug)]
 struct ClapHandler {
@@ -25,7 +25,7 @@ struct ClapHandler {
     #[clap(short, long, default_value = "default_output.gpx")]
     pub destination_file: String,
     #[clap(long)]
-    pub webserver: bool
+    pub webserver: bool,
 }
 
 #[tokio::main]
@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
     println!("{:#?}", handler);
 
     if handler.webserver {
-        handle_web(&handler).await;
+        handle_web(handler).await;
     } else {
         let mut merged = handler.source_file.clone();
         let mut files_in_all_dir: Vec<String> = handler
