@@ -129,28 +129,69 @@ const INDEX_HTML: &str = r#"
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload GPX Files</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        input[type="file"] { display: block; margin: 10px auto; }
-        button { margin-top: 10px; padding: 10px; }
-        #status { margin-top: 20px; font-weight: bold; color: green; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+        }
+        input[type="file"] {
+            display: block;
+            margin: 10px auto;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+        }
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+        }
+        footer {
+            font-size: 14px;
+            color: #555;
+            padding: 10px 0;
+            background: #f5f5f5;
+        }
+        footer a {
+            color: #007acc;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
-    <h2>Upload GPX Files</h2>
-    <p>Upload up to 5 files (at least 2 required).</p>
+    <main>
+        <h2>Upload GPX Files</h2>
+        <p>Upload up to 5 files (at least 2 required).</p>
 
-    <form id="uploadForm">
-        <input type="file" name="file" id="file1" required>
-        <input type="file" name="file" id="file2" required>
-        <input type="file" name="file" id="file3">
-        <input type="file" name="file" id="file4">
-        <input type="file" name="file" id="file5">
-        <label for="creator"><b>Name of device</b><br/> (ex: Garmin Edge 1040, if you don't change it, it will use the first GPX's creator value): </label><br/>
-        <input type="text" name="creator" id="creator"><br/>
-        <button type="submit">Upload</button>
-    </form>
+        <form id="uploadForm">
+            <input type="file" name="file" id="file1" required>
+            <input type="file" name="file" id="file2" required>
+            <input type="file" name="file" id="file3">
+            <input type="file" name="file" id="file4">
+            <input type="file" name="file" id="file5">
+            <label for="creator"><b>Name of device</b><br/> (ex: Garmin Edge 1040, if you don't change it, it will use the first GPX's creator value): </label><br/>
+            <input type="text" name="creator" id="creator"><br/>
+            <button type="submit">Upload</button>
+        </form>
 
-    <p id="status"></p>
+        <p id="status"></p>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/extragornax/rust-gpx-merge" target="_blank">
+                Source Code
+            </a>
+        </p>
+    </footer>
 
     <script>
         document.getElementById("uploadForm").addEventListener("submit", async function(event) {
@@ -210,7 +251,6 @@ const INDEX_HTML: &str = r#"
                         payload.creator = creator;
                     }
 
-
                     // Send all hashes to /trigger
                     let triggerResponse = await fetch("/trigger", {
                         method: "POST",
@@ -243,6 +283,7 @@ const INDEX_HTML: &str = r#"
     </script>
 </body>
 </html>
+
 "#;
 
 async fn home_page() -> impl IntoResponse {
