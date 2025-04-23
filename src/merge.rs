@@ -6,7 +6,7 @@ pub fn sort_files(data: &[Gpx]) -> Vec<Gpx> {
     cloned
 }
 
-pub fn merge_traces(data: &[Gpx]) -> Gpx {
+pub fn merge_traces(data: &[Gpx], creator: Option<String>) -> Gpx {
     if data.is_empty() {
         return Gpx::default();
     } else if data.len() == 1 {
@@ -30,6 +30,10 @@ pub fn merge_traces(data: &[Gpx]) -> Gpx {
             }
         }
     });
+
+    if let Some(cc) = creator {
+        base.creator = Some(cc);
+    }
 
     base
 }

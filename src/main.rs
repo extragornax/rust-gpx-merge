@@ -55,7 +55,9 @@ async fn main() -> std::io::Result<()> {
         println!("Loaded {} gpx files", gpx_extract.len());
         print_stats(&gpx_extract);
 
-        let merged = merge_traces(&gpx_extract);
+        let creator = Some("Extragornax".to_string());
+
+        let merged = merge_traces(&gpx_extract, creator);
         write_gpx(handler.destination_file, &merged)?;
     }
 

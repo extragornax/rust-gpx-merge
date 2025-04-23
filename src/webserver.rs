@@ -15,6 +15,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Deserialize)]
 pub struct TriggerBody {
     hashes: Vec<String>,
+    creator: Option<String>,
 }
 
 #[axum::debug_handler]
@@ -39,7 +40,7 @@ async fn send_to_trigger(Json(body): Json<TriggerBody>) -> Result<Response, Stat
         }
     }
 
-    let merged = merge_traces(&gpx_extract);
+    let merged = merge_traces(&gpx_extract, body.creator);
 
     let mut vec = Vec::new();
     if let Err(e) = gpx::write(&merged, &mut vec) {
@@ -144,6 +145,8 @@ const INDEX_HTML: &str = r#"
         <input type="file" name="file" id="file3">
         <input type="file" name="file" id="file4">
         <input type="file" name="file" id="file5">
+        <label for="creator"><b>Name of device</b><br/> (ex: Garmin Edge 1040, if you don't change it, it will use the first GPX's creator value): </label><br/>
+        <input type="text" name="creator" id="creator"><br/>
         <button type="submit">Upload</button>
     </form>
 
@@ -193,6 +196,8 @@ const INDEX_HTML: &str = r#"
             document.getElementById("status").innerText = "Uploading files...";
             document.getElementById("status").style.color = "blue";
 
+            let creator = document.getElementById("creator").value.trim();
+
             try {
                 await Promise.all(uploadPromises);
 
@@ -200,11 +205,17 @@ const INDEX_HTML: &str = r#"
                     document.getElementById("status").innerText = "Files uploaded! Sending hashes...";
                     document.getElementById("status").style.color = "green";
 
+                    let payload = { hashes: hashes };
+                    if (creator !== "") {
+                        payload.creator = creator;
+                    }
+
+
                     // Send all hashes to /trigger
                     let triggerResponse = await fetch("/trigger", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ "hashes": hashes })
+                        body: JSON.stringify(payload)
                     });
 
                     if (!triggerResponse.ok) throw new Error("Trigger request failed");
